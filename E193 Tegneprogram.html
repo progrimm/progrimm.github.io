@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<HTML lang="no">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="aamgrim">
+    <title></title>
+    <style>
+        *:focus {
+            outline: 0;
+        }
+
+        #tegneflate {
+            border-style: solid;
+            cursor: url('pencil-cursor.png') -25 15, auto;
+        }
+
+        #farge {
+            width: 10px;
+            height: 10px;
+            display: inline-block;
+            background-color: black;
+        }
+
+        button:visited {
+            background-color: lightgrey;
+        }
+    </style>
+    <script src="https://kit.fontawesome.com/97b770a525.js" crossorigin="anonymous"></script>
+    <script>
+        var ctx;
+        var canvasTop = 0;
+        var canvasLeft = 0;
+        var taster = { R: 82, G: 71, B: 66, S: 83 }
+        var farge = "black";
+
+        window.onload = function () {
+            ctx = document.getElementById('tegneflate').getContext("2d");
+            document.getElementById('tegneflate').onmousedown = musNed;
+            document.getElementById('tegneflate').onmouseup = musOpp;
+
+            document.getElementById("linjetykkelse").onchange = function (evt) {
+                ctx.lineWidth = document.getElementById(evt.target.id).value;
+            }
+
+            document.getElementById('tegneflate').onselectstart = function () { return false; }
+            document.onkeyup = tastSluppet;
+
+            var rect = document.getElementById('tegneflate').getBoundingClientRect();
+            canvasTop = rect.top;
+            canvasLeft = rect.left;
+
+            document.getElementById('btn_blyant').onclick = blyant;
+            document.getElementById('btn_viske').onclick = viske;
+
+            document.getElementById('slett').onclick = function () {
+                if (confirm("Trykk 'OK' for å bekrefte valg om permanent sletting")) {
+                    ctx.clearRect(canvasTop, canvasLeft, 500, 500);
+                }
+            }
+
+        }
+
+        function musNed(evt) {
+            document.getElementById('tegneflate').onmousemove = musFlytt;
+            ctx.beginPath();
+            ctx.moveTo(evt.clientX - canvasLeft, evt.clientY - canvasTop);
+        }
+
+        function musOpp(evt) {
+            document.getElementById('tegneflate').onmousemove = null;
+        }
+
+        function musFlytt(evt) {
+            ctx.lineTo(evt.clientX - canvasLeft, evt.clientY - canvasTop);
+            ctx.stroke();
+        }
+
+        function tastSluppet(evt) {
+            if (evt.keyCode === taster.R) {
+                ctx.strokeStyle = "red";
+            }
+            else if (evt.keyCode === taster.G) {
+                ctx.strokeStyle = "green";
+            }
+            else if (evt.keyCode === taster.B) {
+                ctx.strokeStyle = "blue";
+            }
+            else if (evt.keyCode === taster.S) {
+                ctx.strokeStyle = "black";
+            }
+            farge = ctx.strokeStyle;
+            document.getElementById('farge').style.backgroundColor = ctx.strokeStyle;
+        }
+
+        function blyant() {
+            document.getElementById('tegneflate').style.cursor = "url('pencil-cursor.png') -25 15, auto";
+            ctx.strokeStyle = farge;
+        }
+
+        function viske() {
+            document.getElementById('tegneflate').style.cursor = "url(http://www.rw-designer.com/cursor-extern.php?id=72976), auto";
+            ctx.strokeStyle = "white";
+        }
+
+    </script>
+</head>
+
+<body>
+    <canvas id="tegneflate" width="500" height="500"></canvas><br />
+    Farge: <span id="farge"></span> (R=Rød, G=Grønn, B=Blå, S=Sort)<br />
+    <button id="btn_blyant"><i class="fas fa-pencil-alt"></i></button><button id="btn_viske"><i
+            class="fas fa-eraser"></i></button><br />
+    Linjetykkelse: <input id="linjetykkelse" value="1" type="range" step="1" min="1" max="10" /><br />
+    <button id="slett">Ny tegning</button>
+</body>
+
+</HTML>
